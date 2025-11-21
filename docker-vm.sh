@@ -554,21 +554,5 @@ if [ "$START_VM" == "yes" ]; then
 fi
 post_update_to_api "done" "none"
 msg_ok "Completed Successfully!\n"
-
-# -------------------------------
-# AUTOMATIC DOCKER INSTALLATION
-# -------------------------------
-if command -v qm >/dev/null 2>&1; then
-    if [ "$START_VM" == "yes" ]; then
-        msg_info "Installing Docker inside the VM..."
-        sleep 10  # VM’nin tamamen açılmasını bekle
-
-        # Docker kurulumu komutları
-        qm guest exec $VMID -- bash -c "apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker"
-
-        msg_ok "✅ Docker & Docker Compose installed successfully inside VM"
-    fi
-fi
-
 echo -e "Setup Cloud-Init before starting \n
 More info at https://github.com/community-scripts/ProxmoxVE/discussions/272 \n"
