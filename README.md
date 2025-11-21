@@ -26,6 +26,19 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/yelken-dijital/linux-scr
 
 > İlk girişte şifreyi değiştirmeniz tavsiye edilir.
 
+## 🐧 Ubuntu 2504 VM Kurulumu
+
+Proxmox üzerinde otomatik Ubuntu VM oluşturur.  
+Tüm yapılandırmalar (VM, ağ, depolama, paket kurulumları vb.) script tarafından yapılır.
+
+### 📥 Kurulum
+
+Terminalde aşağıdaki komutu çalıştırmanız yeterlidir:
+
+```sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yelken-dijital/linux-scripts/refs/heads/main/ubuntu-vm.sh)"
+``` 
+
 ----------
 
 ## 📘 Notlar
