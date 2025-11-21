@@ -564,7 +564,7 @@ if command -v qm >/dev/null 2>&1; then
         sleep 10  # VM’nin tamamen açılmasını bekle
 
         # Docker kurulumu komutları
-        qm guest exec $VMID -- bash -c "apt update && apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && systemctl enable docker && systemctl start docker"
+        qm guest exec $VMID -- bash -c "apt update && apt install -y docker.io docker-compose && systemctl enable docker && systemctl start docker"
 
         msg_ok "✅ Docker & Docker Compose installed successfully inside VM"
     fi
