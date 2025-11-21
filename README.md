@@ -15,14 +15,14 @@ Tüm yapılandırmalar (VM, ağ, depolama, paket kurulumları vb.) script taraf�
 
 Terminalde aşağıdaki komutu çalıştırmanız yeterlidir:
 
-`bash -c "$(curl -fsSL https://raw.githubusercontent.com/yelken-dijital/linux-scripts/refs/heads/main/docker-vm.sh)"` 
+```sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yelken-dijital/linux-scripts/refs/heads/main/docker-vm.sh)"
+``` 
 
 ### 🔑 Varsayılan Bilgiler
 
--   **Kullanıcı:**  `root`
-    
--   **Şifre:**  `Docker`
-    
+-   **Kullanıcı:**  `root` 
+-   **Şifre:**  `docker`  
 
 > İlk girişte şifreyi değiştirmeniz tavsiye edilir.
 
@@ -31,7 +31,5 @@ Terminalde aşağıdaki komutu çalıştırmanız yeterlidir:
 ## 📘 Notlar
 
 -   Scriptler yalnızca Linux ortamları için optimize edilmiştir.
-    
--   Proxmox VE 9.0+ sürümleriyle uyumludur.
-    
+-   Proxmox VE 9.0+ sürümleriyle uyumludur.  
 -   Her script düzenli olarak güncellenir.
