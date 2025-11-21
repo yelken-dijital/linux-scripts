@@ -1,12 +1,15 @@
 
 # 🌊 Yelken Dijital – Linux Scripts
 
+```
 __  __     ____                 ____  _   _ _ __        __            __  ______ 
 \ \/ /__  / / /_____  ____     / __ \(_) (_|_) /_____ _/ /            \ \/ / __ \
  \  / _ \/ / //_/ _ \/ __ \   / / / / / / / / __/ __ `/ /  ______      \  / / / /
  / /  __/ / ,< /  __/ / / /  / /_/ / / / / / /_/ /_/ / /  /_____/      / / /_/ / 
 /_/\___/_/_/|_|\___/_/ /_/  /_____/_/_/ /_/\__/\__,_/_/               /_/_____/  
                                    /___/                                         
+```
+
 
 Yelken Dijital tarafından geliştirilen otomasyon ve sunucu yönetim scriptlerinin toplu deposu.  
 Bu scriptler; Proxmox, Docker, sanallaştırma ve sistem kurulumlarını hızlı, güvenli ve standart hâle getirmek için hazırlanmıştır.
