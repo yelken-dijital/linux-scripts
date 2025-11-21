@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Copyright (c) 2021-2025 community-scripts ORG
-# Author: thost96 (thost96) | Co-Author: michelroegl-brunner
+# Author: MickLesk (CanbiZ)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # ------------------------------------------------------------------------------------------
 # Custom Build by Yelken Dijital (ynssenem)
@@ -10,15 +10,17 @@
 
 source /dev/stdin <<<$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/api.func)
 
-function header_info() {
+function header_info {
   clear
   cat <<"EOF"
-__  ______     ____             __                _    ____  ___
-\ \/ / __ \   / __ \____  _____/ /_____  _____   | |  / /  |/  /
- \  / / / /  / / / / __ \/ ___/ //_/ _ \/ ___/   | | / / /|_/ / 
- / / /_/ /  / /_/ / /_/ / /__/ ,< /  __/ /       | |/ / /  / /  
-/_/_____/  /_____/\____/\___/_/|_|\___/_/        |___/_/  /_/   
-                                                                                                                                  
+
+__  ______     ____             __                __  ____                __           ___   __________  __ __     _    ____  ___
+\ \/ / __ \   / __ \____  _____/ /_____  _____   / / / / /_  __  ______  / /___  __   |__ \ / ____/ __ \/ // /    | |  / /  |/  /
+ \  / / / /  / / / / __ \/ ___/ //_/ _ \/ ___/  / / / / __ \/ / / / __ \/ __/ / / /   __/ //___ \/ / / / // /_    | | / / /|_/ / 
+ / / /_/ /  / /_/ / /_/ / /__/ ,< /  __/ /     / /_/ / /_/ / /_/ / / / / /_/ /_/ /   / __/____/ / /_/ /__  __/    | |/ / /  / /  
+/_/_____/  /_____/\____/\___/_/|_|\___/_/      \____/_.___/\__,_/_/ /_/\__/\__,_/   /____/_____/\____/  /_/       |___/_/  /_/   
+                                                                                                                                    
+                                                                                   
 EOF
 }
 header_info
@@ -26,10 +28,9 @@ echo -e "\n Loading..."
 GEN_MAC=02:$(openssl rand -hex 5 | awk '{print toupper($0)}' | sed 's/\(..\)/\1:/g; s/.$//')
 RANDOM_UUID="$(cat /proc/sys/kernel/random/uuid)"
 METHOD=""
-NSAPP="docker-vm"
-var_os="debian"
-var_version="12"
-DISK_SIZE="10G"
+NSAPP="ubuntu-2504-vm"
+var_os="ubuntu"
+var_version="2504"
 
 YW=$(echo "\033[33m")
 BL=$(echo "\033[36m")
@@ -62,7 +63,6 @@ MACADDRESS="${TAB}🔗${TAB}${CL}"
 VLANTAG="${TAB}🏷️${TAB}${CL}"
 CREATING="${TAB}🚀${TAB}${CL}"
 ADVANCED="${TAB}🧩${TAB}${CL}"
-CLOUD="${TAB}☁️${TAB}${CL}"
 
 THIN="discard=on,ssd=1,"
 set -e
@@ -74,8 +74,8 @@ function error_handler() {
   local exit_code="$?"
   local line_number="$1"
   local command="$2"
+  post_update_to_api "failed" "$command"
   local error_message="${RD}[ERROR]${CL} in line ${RD}$line_number${CL}: exit code ${RD}$exit_code${CL}: while executing command ${YW}$command${CL}"
-  post_update_to_api "failed" "${command}"
   echo -e "\n$error_message\n"
   cleanup_vmid
 }
@@ -106,13 +106,12 @@ function cleanup_vmid() {
 
 function cleanup() {
   popd >/dev/null
-  post_update_to_api "done" "none"
   rm -rf $TEMP_DIR
 }
 
 TEMP_DIR=$(mktemp -d)
 pushd $TEMP_DIR >/dev/null
-if whiptail --backtitle "Proxmox VE Helper Scripts" --title "Docker VM" --yesno "This will create a New Docker VM. Proceed?" 10 58; then
+if whiptail --backtitle "Proxmox VE Helper Scripts" --title "Ubuntu 25.04 VM" --yesno "This will create a New Ubuntu 25.04 VM. Proceed?" 10 58; then
   :
 else
   header_info && echo -e "${CROSS}${RD}User exited script${CL}\n" && exit
@@ -210,12 +209,12 @@ function default_settings() {
   VMID=$(get_valid_nextid)
   FORMAT=",efitype=4m"
   MACHINE=""
+  DISK_SIZE="7G"
   DISK_CACHE=""
-  DISK_SIZE="10G"
-  HN="docker"
+  HN="ubuntu"
   CPU_TYPE=""
   CORE_COUNT="2"
-  RAM_SIZE="4096"
+  RAM_SIZE="2048"
   BRG="vmbr0"
   MAC="$GEN_MAC"
   VLAN=""
@@ -235,7 +234,7 @@ function default_settings() {
   echo -e "${VLANTAG}${BOLD}${DGN}VLAN: ${BGN}Default${CL}"
   echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}Default${CL}"
   echo -e "${GATEWAY}${BOLD}${DGN}Start VM when completed: ${BGN}yes${CL}"
-  echo -e "${CREATING}${BOLD}${DGN}Creating a Docker VM using the above default settings${CL}"
+  echo -e "${CREATING}${BOLD}${DGN}Creating a Ubuntu 25.04 VM using the above default settings${CL}"
 }
 
 function advanced_settings() {
@@ -305,9 +304,9 @@ function advanced_settings() {
     exit-script
   fi
 
-  if VM_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Hostname" 8 58 docker --title "HOSTNAME" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if VM_NAME=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Hostname" 8 58 ubuntu --title "HOSTNAME" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $VM_NAME ]; then
-      HN="docker"
+      HN="ubuntu"
       echo -e "${HOSTNAME}${BOLD}${DGN}Hostname: ${BGN}$HN${CL}"
     else
       HN=$(echo ${VM_NAME,,} | tr -d ' ')
@@ -411,8 +410,8 @@ function advanced_settings() {
     START_VM="no"
   fi
 
-  if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "ADVANCED SETTINGS COMPLETE" --yesno "Ready to create a Docker VM?" --no-button Do-Over 10 58); then
-    echo -e "${CREATING}${BOLD}${DGN}Creating a Docker VM using the above advanced settings${CL}"
+  if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "ADVANCED SETTINGS COMPLETE" --yesno "Ready to create a Ubuntu 25.04 VM?" --no-button Do-Over 10 58); then
+    echo -e "${CREATING}${BOLD}${DGN}Creating a Ubuntu 25.04 VM using the above advanced settings${CL}"
   else
     header_info
     echo -e "${ADVANCED}${BOLD}${RD}Using Advanced Settings${CL}"
@@ -466,8 +465,8 @@ else
 fi
 msg_ok "Using ${CL}${BL}$STORAGE${CL} ${GN}for Storage Location."
 msg_ok "Virtual Machine ID is ${CL}${BL}$VMID${CL}."
-msg_info "Retrieving the URL for the Debian 12 Qcow2 Disk Image"
-URL="https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-$(dpkg --print-architecture).qcow2"
+msg_info "Retrieving the URL for the Ubuntu 25.04 Disk Image"
+URL=https://cloud-images.ubuntu.com/plucky/current/plucky-server-cloudimg-amd64.img
 sleep 2
 msg_ok "${CL}${BL}${URL}${CL}"
 curl -f#SL -o "$(basename "$URL")" "$URL"
@@ -475,9 +474,9 @@ echo -en "\e[1A\e[0K"
 FILE=$(basename $URL)
 msg_ok "Downloaded ${CL}${BL}${FILE}${CL}"
 
-STORAGE_TYPE=$(pvesm status -storage "$STORAGE" | awk 'NR>1 {print $2}')
+STORAGE_TYPE=$(pvesm status -storage $STORAGE | awk 'NR>1 {print $2}')
 case $STORAGE_TYPE in
-nfs | dir)
+nfs | dir | cifs)
   DISK_EXT=".qcow2"
   DISK_REF="$VMID/"
   DISK_IMPORT="-format qcow2"
@@ -497,32 +496,7 @@ for i in {0,1}; do
   eval DISK${i}_REF=${STORAGE}:${DISK_REF:-}${!disk}
 done
 
-if ! command -v virt-customize &>/dev/null; then
-  msg_info "Installing Pre-Requisite libguestfs-tools onto Host"
-  apt-get -qq update >/dev/null
-  apt-get -qq install libguestfs-tools lsb-release -y >/dev/null
-  # Workaround for Proxmox VE 9.0 libguestfs issue
-  apt-get -qq install dhcpcd-base -y >/dev/null 2>&1 || true
-  msg_ok "Installed libguestfs-tools successfully"
-fi
-
-msg_info "Adding Docker and Docker Compose Plugin to Debian 12 Qcow2 Disk Image"
-virt-customize -q -a "${FILE}" --install qemu-guest-agent,apt-transport-https,ca-certificates,curl,gnupg,software-properties-common,lsb-release >/dev/null &&
-  virt-customize -q -a "${FILE}" --run-command "mkdir -p /etc/apt/keyrings && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg" >/dev/null &&
-  virt-customize -q -a "${FILE}" --run-command "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable' > /etc/apt/sources.list.d/docker.list" >/dev/null &&
-  virt-customize -q -a "${FILE}" --run-command "apt-get update -qq && apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin" >/dev/null &&
-  virt-customize -q -a "${FILE}" --run-command "systemctl enable docker" >/dev/null &&
-  virt-customize -q -a "${FILE}" --hostname "${HN}" >/dev/null &&
-  virt-customize -q -a "${FILE}" --run-command "echo -n > /etc/machine-id" >/dev/null
-msg_ok "Added Docker and Docker Compose Plugin to Debian 12 Qcow2 Disk Image successfully"
-
-msg_info "Expanding root partition to use full disk space"
-qemu-img create -f qcow2 expanded.qcow2 ${DISK_SIZE} >/dev/null 2>&1
-virt-resize --expand /dev/sda1 ${FILE} expanded.qcow2 >/dev/null 2>&1
-mv expanded.qcow2 ${FILE} >/dev/null 2>&1
-msg_ok "Expanded image to full size"
-
-msg_info "Creating a Docker VM"
+msg_info "Creating a Ubuntu 25.04 VM"
 qm create $VMID -agent 1${MACHINE} -tablet 0 -localtime 1 -bios ovmf${CPU_TYPE} -cores $CORE_COUNT -memory $RAM_SIZE \
   -name $HN -tags community-script -net0 virtio,bridge=$BRG,macaddr=$MAC$VLAN$MTU -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
 pvesm alloc $STORAGE $VMID $DISK0 4M 1>&/dev/null
@@ -530,11 +504,9 @@ qm importdisk $VMID ${FILE} $STORAGE ${DISK_IMPORT:-} 1>&/dev/null
 qm set $VMID \
   -efidisk0 ${DISK0_REF}${FORMAT} \
   -scsi0 ${DISK1_REF},${DISK_CACHE}${THIN}size=${DISK_SIZE} \
+  -ide2 ${STORAGE}:cloudinit \
   -boot order=scsi0 \
   -serial0 socket >/dev/null
-qm resize $VMID scsi0 8G >/dev/null
-qm set $VMID --agent enabled=1 >/dev/null
-
 DESCRIPTION=$(
   cat <<EOF
 <div align='center'>
@@ -542,14 +514,14 @@ DESCRIPTION=$(
     <img src='https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/images/logo-81x112.png' alt='Logo' style='width:81px;height:112px;'/>
   </a>
 
-  <h2 style='font-size: 24px; margin: 20px 0;'>Docker VM</h2>
+  <h2 style='font-size: 24px; margin: 20px 0;'>ubuntu VM</h2>
 
   <p style='margin: 16px 0;'>
     <a href='https://ko-fi.com/community_scripts' target='_blank' rel='noopener noreferrer'>
       <img src='https://img.shields.io/badge/&#x2615;-Buy us a coffee-blue' alt='spend Coffee' />
     </a>
   </p>
-
+  
   <span style='margin: 0 10px;'>
     <i class="fa fa-github fa-fw" style="color: #f5f5f5;"></i>
     <a href='https://github.com/community-scripts/ProxmoxVE' target='_blank' rel='noopener noreferrer' style='text-decoration: none; color: #00617f;'>GitHub</a>
@@ -566,12 +538,37 @@ DESCRIPTION=$(
 EOF
 )
 qm set "$VMID" -description "$DESCRIPTION" >/dev/null
+if [ -n "$DISK_SIZE" ]; then
+  msg_info "Resizing disk to $DISK_SIZE GB"
+  qm resize $VMID scsi0 ${DISK_SIZE} >/dev/null
+else
+  msg_info "Using default disk size of $DEFAULT_DISK_SIZE GB"
+  qm resize $VMID scsi0 ${DEFAULT_DISK_SIZE} >/dev/null
+fi
 
-msg_ok "Created a Docker VM ${CL}${BL}(${HN})"
+msg_ok "Created a Ubuntu 25.04 VM ${CL}${BL}(${HN})"
 if [ "$START_VM" == "yes" ]; then
-  msg_info "Starting Docker VM"
+  msg_info "Starting Ubuntu 25.04 VM"
   qm start $VMID
-  msg_ok "Started Docker VM"
+  msg_ok "Started Ubuntu 25.04 VM"
 fi
 post_update_to_api "done" "none"
 msg_ok "Completed Successfully!\n"
+
+# -------------------------------
+# AUTOMATIC DOCKER INSTALLATION
+# -------------------------------
+if command -v qm >/dev/null 2>&1; then
+    if [ "$START_VM" == "yes" ]; then
+        msg_info "Installing Docker inside the VM..."
+        sleep 10  # VM’nin tamamen açılmasını bekle
+
+        # Docker kurulumu komutları
+        qm guest exec $VMID -- bash -c "apt update && apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && systemctl enable docker && systemctl start docker"
+
+        msg_ok "✅ Docker & Docker Compose installed successfully inside VM"
+    fi
+fi
+
+echo -e "Setup Cloud-Init before starting \n
+More info at https://github.com/community-scripts/ProxmoxVE/discussions/272 \n"
