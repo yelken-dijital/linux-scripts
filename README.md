@@ -15,7 +15,7 @@ Tüm yapılandırmalar (VM, ağ, depolama, paket kurulumları vb.) script taraf�
 
 Terminalde aşağıdaki komutu çalıştırmanız yeterlidir:
 
-`bash -c "$(curl -fsSL https://raw.githubusercontent.com/Yelken-Dijital/linux-scripts/refs/heads/main/docker-vm.sh)"` 
+`bash -c "$(curl -fsSL https://raw.githubusercontent.com/yelken-dijital/linux-scripts/refs/heads/main/docker-vm.sh)"` 
 
 ### 🔑 Varsayılan Bilgiler
 
